@@ -1,1 +1,13 @@
+[Unit]
+Description=Rasterisk Server Service
+After=network.target
 
+[Service]
+User=asterisk
+Group=asterisk
+ExecStart=/usr/sbin/rasterisk --server
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

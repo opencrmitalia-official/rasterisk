@@ -1,1 +1,26 @@
+#!/usr/bin/env bash
+set -e
 
+if [ "$1" == "--server" ]; then
+	echo "Starting rasterisk..."
+	socat TCP-LISTEN:5066,fork EXEC:'/usr/sbin/rasterisk --exec'
+	exit 0
+fi
+
+if [ "$1" == "--exec" ]; then
+  options=$(cat)
+  rm -f /tmp/rasterisk.log
+	#echo "Server Args: ${options}"
+	bash -c "asterisk ${options}" 2> /tmp/rasterisk.log && true
+	exit 0
+fi
+
+options=""
+for arg in "$@"; do
+    options+="\"$arg\" "
+done
+options=${options% }
+
+#echo "Client Args: ${options}"
+echo "${options}" | socat - TCP:0.0.0.0:5066
+[ -s /tmp/rasterisk.log ] && cat /tmp/rasterisk.log >&2
